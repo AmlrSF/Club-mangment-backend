@@ -286,6 +286,7 @@ const addInterestToCustomer = async (req, res) => {
     try {
       // Find the customer by ID
       const customer = await Customer.findById(customerId);
+      console.log(customer)
   
       if (!customer) {
         return res.status(404).json({ success: false, error: 'Customer not found' });

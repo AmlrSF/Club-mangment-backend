@@ -26,7 +26,7 @@ router.route('/profile')
     .post(authenticate, getProfile);
 
 
-router.route('/:customerId/interests', addInterestToCustomer)
+router.route('/:customerId/interests').post(addInterestToCustomer)
 
 
 router.route('/:id')
