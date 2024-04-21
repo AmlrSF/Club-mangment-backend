@@ -2,8 +2,8 @@ const Club = require('../schema/clubs');
 require('dotenv').config()
 const cloudinary = require('cloudinary').v2;
 
-
-
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -36,7 +36,7 @@ const createClub = async (req, res) => {
 // Get all clubs
 const getAllClubs = async (req, res) => {
     try {
-        const clubs = await Club.find();
+        const clubs = await Club.find().populate('ownerId');
         res.status(200).json({ success: true, clubs });
     } catch (error) {
         console.error('Error fetching clubs:', error);
@@ -44,10 +44,15 @@ const getAllClubs = async (req, res) => {
     }
 };
 
+
 const getAllClubsByownerID = async (req, res) => {
+    const id = req.params.id;
+
     try {
-        const clubs = await Club.find({ownerId:req.params.id});
-        res.status(200).json({ success: true,msg:`all clubs by ${req.params.id}`, clubs });
+        const clubs = await Club.find();
+        console.log(clubs);
+        let clubsbyId = clubs.filter(item=>item.ownerId == new ObjectId(id) );
+        res.status(200).json({ success: true, clubsbyId });
     } catch (error) {
         console.error('Error fetching clubs:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
