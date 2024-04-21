@@ -5,7 +5,8 @@ const {
     getAllClubs,
     getClubById,
     updateClub,
-    deleteClubById
+    deleteClubById,
+    getAllClubsByownerID
 } = require('../controllers/clubCrud');
 
 // Define routes for the base endpoint '/clubs'
@@ -17,6 +18,7 @@ router.route('/')
 router.route('/:id')
     .get(getClubById) // Get a club by ID
     .put(updateClub) // Update a club by ID
-    .delete(deleteClubById); // Delete a club by ID
+    .delete(deleteClubById) // Delete a club by ID
+    .get(getAllClubsByownerID)
 
 module.exports = router;

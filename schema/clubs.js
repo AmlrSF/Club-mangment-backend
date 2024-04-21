@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const clubSchema = new mongoose.Schema({
-  club_name: { type: String },
-  club_description: { type: String },
-  club_genre: { type: String, required: true },
-  club_owner_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }, // Reference to the owner customer
-  created_at: { type: Date, default:Date.now() },
-  profile_picture: { type: String },
+  clubName: { type: String },
+  description: { type: String },
+  genre: { type: String, required: true },
+  ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }, // Reference to the owner customer
+  createdAt: { type: Date, default:Date.now() },
+  profilePicture: { type: String },
   categorie: { type: String },
   approved: { type: Boolean, default: false } ,
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }] // Array of customer references

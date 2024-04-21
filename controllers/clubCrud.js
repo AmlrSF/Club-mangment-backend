@@ -1,9 +1,31 @@
 const Club = require('../schema/clubs');
+require('dotenv').config()
+const cloudinary = require('cloudinary').v2;
 
+
+
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+});
 // Create a new club
 const createClub = async (req, res) => {
     try {
-        const newClub = await Club.create(req.body);
+        let profilePictureUrl = null;
+
+        if (req.body.profilePicture) {
+            const photoUrl = await cloudinary.uploader.upload(req.body.profilePicture);
+            profilePictureUrl = photoUrl.url;
+        }
+
+        // Create the new club with the profile picture URL
+        const newClub = await Club.create({
+            ...req.body,
+            profilePicture: profilePictureUrl
+        });
+
         res.status(201).json({ success: true, club: newClub });
     } catch (error) {
         console.error('Error creating club:', error);
@@ -21,6 +43,17 @@ const getAllClubs = async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
+
+const getAllClubsByownerID = async (req, res) => {
+    try {
+        const clubs = await Club.find({ownerId:req.params.id});
+        res.status(200).json({ success: true,msg:`all clubs by ${req.params.id}`, clubs });
+    } catch (error) {
+        console.error('Error fetching clubs:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
 
 // Get a club by ID
 const getClubById = async (req, res) => {
@@ -72,5 +105,6 @@ module.exports = {
     getAllClubs,
     getClubById,
     updateClub,
-    deleteClubById
+    deleteClubById,
+    getAllClubsByownerID
 };
