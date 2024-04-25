@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'Customer', 
     required: true
   },
   club: {
@@ -25,11 +25,11 @@ const postSchema = new mongoose.Schema({
   },
   upvotes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Customer'
   }],
   downvotes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Customer'
   }]
 });
 

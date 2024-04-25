@@ -11,17 +11,20 @@ cloudinary.config({
 // Create a new post
 const createPost = async (req, res) => {
     try {
-        let profilePictureUrl = null;
+        let image = null;
 
-        if (req.body.profilePicture) {
-            const photoUrl = await cloudinary.uploader.upload(req.body.profilePicture);
-            profilePictureUrl = photoUrl.url;
+        if (req.body.imageUrl) {
+            const photoUrl = await cloudinary.uploader.upload(req.body.imageUrl);
+            image = photoUrl.url;
         }
+
+
+        console.log(req.body);
 
         // Create the new club with the profile picture URL
         const newPost = await Post.create({
             ...req.body,
-            imageUrl: profilePictureUrl
+            imageUrl: image
         });
 
         res.status(201).json({ success: true, posts: newPost });
@@ -84,13 +87,31 @@ const deletePostById = async (req, res) => {
 };
 
 // Toggle upvote for a post
+// Toggle upvote for a post
 const toggleUpvote = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const postId = req.params.id;
+        const userId = req.body.id; // Assuming user ID is available in req.user
+
+        const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
-        post.upvotes += 1;
+
+        const userIndexInUpvotes = post.upvotes.indexOf(userId);
+        if (userIndexInUpvotes !== -1) {
+            // If user has already upvoted, remove the upvote
+            post.upvotes.splice(userIndexInUpvotes, 1);
+        } else {
+            // If user has not upvoted, add the upvote
+            post.upvotes.push(userId);
+            // If user has previously downvoted, remove the downvote
+            const userIndexInDownvotes = post.downvotes.indexOf(userId);
+            if (userIndexInDownvotes !== -1) {
+                post.downvotes.splice(userIndexInDownvotes, 1);
+            }
+        }
+
         await post.save();
         res.status(200).json({ success: true, message: 'Upvote toggled successfully', post });
     } catch (error) {
@@ -99,14 +120,32 @@ const toggleUpvote = async (req, res) => {
     }
 };
 
+
 // Toggle downvote for a post
 const toggleDownvote = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const postId = req.params.id;
+        const userId = req.body.id; // Assuming user ID is available in req.user
+
+        const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
-        post.downvotes += 1;
+
+        const userIndexInDownvotes = post.downvotes.indexOf(userId);
+        if (userIndexInDownvotes !== -1) {
+            // If user has already downvoted, remove the downvote
+            post.downvotes.splice(userIndexInDownvotes, 1);
+        } else {
+            // If user has not downvoted, add the downvote
+            post.downvotes.push(userId);
+            // If user has previously upvoted, remove the upvote
+            const userIndexInUpvotes = post.upvotes.indexOf(userId);
+            if (userIndexInUpvotes !== -1) {
+                post.upvotes.splice(userIndexInUpvotes, 1);
+            }
+        }
+
         await post.save();
         res.status(200).json({ success: true, message: 'Downvote toggled successfully', post });
     } catch (error) {
@@ -115,10 +154,11 @@ const toggleDownvote = async (req, res) => {
     }
 };
 
-const getPostByGroupeId = async()=>{
+
+const getPostByGroupeId = async(req,res)=>{
     try {
         try {
-            const posts = await Post.find({author : req.params.id});
+            const posts = await Post.find({club : req.params.id});
             res.status(200).json({ success: true, posts });
         } catch (error) {
             console.error('Error fetching posts:', error);

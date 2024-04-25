@@ -22,7 +22,8 @@ router.route('/:id')
     .put(updatePost) // Update a post by ID
     .delete(deletePostById); // Delete a post by ID
 
-    router.route('/groupe/:id').get(getPostByGroupeId)
+router.route('/club/:id')
+    .get(getPostByGroupeId)
 // Route to toggle upvote for a post
 router.route('/:id/upvote')
     .patch(toggleUpvote);
