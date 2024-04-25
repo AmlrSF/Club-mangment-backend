@@ -1,20 +1,39 @@
 const Post = require('../schema/post');
+require('dotenv').config()
+const cloudinary = require('cloudinary').v2;
 
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+});
 // Create a new post
 const createPost = async (req, res) => {
     try {
-        const newPost = await Post.create(req.body);
-        res.status(201).json({ success: true, post: newPost });
+        let profilePictureUrl = null;
+
+        if (req.body.profilePicture) {
+            const photoUrl = await cloudinary.uploader.upload(req.body.profilePicture);
+            profilePictureUrl = photoUrl.url;
+        }
+
+        // Create the new club with the profile picture URL
+        const newPost = await Post.create({
+            ...req.body,
+            imageUrl: profilePictureUrl
+        });
+
+        res.status(201).json({ success: true, posts: newPost });
     } catch (error) {
         console.error('Error creating post:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
-
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find();
+        const posts = await Post.find().populate('author').populate('club');
         res.status(200).json({ success: true, posts });
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -96,6 +115,20 @@ const toggleDownvote = async (req, res) => {
     }
 };
 
+const getPostByGroupeId = async()=>{
+    try {
+        try {
+            const posts = await Post.find({author : req.params.id});
+            res.status(200).json({ success: true, posts });
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            res.status(500).json({ success: false, error: 'Internal server error' });
+        }
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     createPost,
     getAllPosts,
@@ -103,5 +136,6 @@ module.exports = {
     updatePost,
     deletePostById,
     toggleUpvote,
-    toggleDownvote
+    toggleDownvote,
+    getPostByGroupeId
 };
