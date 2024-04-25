@@ -6,6 +6,7 @@ const connectToMongoDb = require('./dbConnection/connect');
 const customer = require('./routes/customerRoute');
 const interest = require('./routes/interestRoute');
 const club = require('./routes/clubRoute');
+const post = require('./routes/postRoute');
 
 
 const cookieParser = require('cookie-parser');
@@ -25,7 +26,7 @@ app.use('/api/v1/interests',interest)
 
 app.use('/api/v1/clubs',club)
 
-
+app.use('/api/v1/posts',post)
 
 
 
