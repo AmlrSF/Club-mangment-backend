@@ -1,7 +1,7 @@
 const Club = require('../schema/clubs');
 require('dotenv').config()
 const cloudinary = require('cloudinary').v2;
-
+const Post = require('../schema/post');
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 
@@ -90,20 +90,26 @@ const updateClub = async (req, res) => {
     }
 };
 
-// Delete a club by ID
 const deleteClubById = async (req, res) => {
     const clubId = req.params.id;
     try {
+        // Delete all posts related to the club
+        await Post.deleteMany({ club: clubId });
+        
+        // Now delete the club
         const deletedClub = await Club.findByIdAndDelete(clubId);
+        
         if (!deletedClub) {
             return res.status(404).json({ success: false, error: 'Club not found' });
         }
+        
         res.status(200).json({ success: true, message: 'Club deleted successfully' });
     } catch (error) {
         console.error('Error deleting club:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
+
 
 module.exports = {
     createClub,
