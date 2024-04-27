@@ -33,6 +33,8 @@ const createClub = async (req, res) => {
     }
 };
 
+
+
 // Get all clubs
 const getAllClubs = async (req, res) => {
     try {
