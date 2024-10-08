@@ -12,18 +12,14 @@ const customerSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  registrationDate: {
-    type: Date,
-    default: Date.now()
-  },
-  facebookLink: String,
-  linkedinLink: String,
   Identificated:{
     type:Boolean,
     default: false
   },
-  classe:String,
-  cvAttachment: String, // Assuming the CV attachment is stored as a file path
+  registrationDate: {
+    type: Date,
+    default: Date.now()
+  },
   interests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Interest' }] // Assuming interests are stored in another schema named 'Interest'
 });
 
