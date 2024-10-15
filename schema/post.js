@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 const postSchema = new mongoose.Schema({
   content: {
     type: String,
@@ -13,7 +15,6 @@ const postSchema = new mongoose.Schema({
   club: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Club',
-    required: true
   },
   imageUrl: {
     type: String,
@@ -30,7 +31,13 @@ const postSchema = new mongoose.Schema({
   downvotes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer'
-  }]
+  }],
+  postType: {
+    type: String,
+    enum: ['profile', 'club'],
+    required: true
+  } 
+
 });
 
 const Post = mongoose.model('Post', postSchema);
