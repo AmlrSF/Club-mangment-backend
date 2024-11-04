@@ -8,11 +8,14 @@ const clubSchema = new mongoose.Schema({
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true }, // Reference to the owner customer
   createdAt: { type: Date, default: Date.now },
   profilePicture: { type: String },
-  category: { type: String, required: true },  // Added category field as per UI
+   
   approved: { type: Boolean, default: false },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }], // Array of customer references
   moderators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }], // Array of customer references for moderators
-
+  featured:{
+    type:Boolean,
+    default:false
+  },
   // Permissions Section
   permissions: {
     postPermission: { type: String, enum: ['all', 'moderators'], default: 'moderators' }, // Post content permissions

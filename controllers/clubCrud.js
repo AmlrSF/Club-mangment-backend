@@ -66,7 +66,7 @@ const getAllClubsByownerID = async (req, res) => {
 const getClubById = async (req, res) => {
     const clubId = req.params.id;
     try {
-        const club = await Club.findById(clubId);
+        const club = await Club.findById(clubId).populate('ownerId');;
         if (!club) {
             return res.status(404).json({ success: false, error: 'Club not found' });
         }
@@ -113,11 +113,41 @@ const deleteClubById = async (req, res) => {
 };
 
 
+const joinSquad = async (req, res) => {
+    const { id: squadId } = req.params; // Get the squad ID from the route parameters
+    const { userId } = req.body; // Get the user ID from the request body
+  
+    try {
+      // Find the squad by ID
+      const squad = await Club.findById(squadId); // Assuming squads are managed in the Club model
+      if (!squad) {
+        return res.status(404).json({ success: false, error: 'Squad not found' });
+      }
+  
+      // Check if the user is already a member
+      if (squad.members.includes(userId)) {
+        return res.status(400).json({ success: false, error: 'User is already a member' });
+      }
+  
+      // Add the user to the members array
+      squad.members.push(userId);
+      await squad.save();
+  
+      res.status(200).json({ success: true, message: 'User successfully joined the squad' });
+    } catch (error) {
+      console.error('Error joining squad:', error);
+      res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+  };
+  
+
 module.exports = {
+    joinSquad,
     createClub,
     getAllClubs,
     getClubById,
     updateClub,
     deleteClubById,
-    getAllClubsByownerID
+    getAllClubsByownerID,
+
 };
