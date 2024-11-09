@@ -40,8 +40,7 @@ const getAllClubs = async (req, res) => {
   try {
     const clubs = await Club.find()
       .populate("ownerId")
-      .populate("members")
-      .populate("moderators");
+    
     res.status(200).json({ success: true, clubs });
   } catch (error) {
     console.error("Error fetching clubs:", error);
@@ -151,6 +150,96 @@ const joinSquad = async (req, res) => {
   }
 };
 
+// Upgrade a user to moderator
+const upgradeUserToModerator = async (req, res) => {
+  const { id: squadId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const squad = await Club.findById(squadId);
+    if (!squad) {
+      return res.status(404).json({ success: false, error: "Squad not found" });
+    }
+
+    if (!squad.members.includes(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User is not a member" });
+    }
+
+    squad.members = squad.members.filter(
+      (member) => member.toString() !== userId
+    );
+    squad.moderators.push(userId);
+
+    await squad.save();
+    res
+      .status(200)
+      .json({ success: true, message: "User upgraded to moderator" });
+  } catch (error) {
+    console.error("Error upgrading user to moderator:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+// Downgrade a moderator to member
+const downgradeUserToModerator = async (req, res) => {
+  const { id: squadId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const squad = await Club.findById(squadId);
+    if (!squad) {
+      return res.status(404).json({ success: false, error: "Squad not found" });
+    }
+
+    if (!squad.moderators.includes(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User is not a moderator" });
+    }
+
+    squad.moderators = squad.moderators.filter(
+      (mod) => mod.toString() !== userId
+    );
+    squad.members.push(userId);
+
+    await squad.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Moderator downgraded to member" });
+  } catch (error) {
+    console.error("Error downgrading moderator to member:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+// Ban user from squad
+const banUserFromSquad = async (req, res) => {
+  const { id: squadId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const squad = await Club.findById(squadId);
+    if (!squad) {
+      return res.status(404).json({ success: false, error: "Squad not found" });
+    }
+
+    squad.members = squad.members.filter(
+      (member) => member.toString() !== userId
+    );
+    squad.moderators = squad.moderators.filter(
+      (mod) => mod.toString() !== userId
+    );
+
+    await squad.save();
+    res.status(200).json({ success: true, message: "User banned from squad" });
+  } catch (error) {
+    console.error("Error banning user from squad:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
 module.exports = {
   joinSquad,
   createClub,
@@ -159,4 +248,7 @@ module.exports = {
   updateClub,
   deleteClubById,
   getAllClubsByownerID,
+  upgradeUserToModerator,
+  downgradeUserToModerator,
+  banUserFromSquad,
 };
