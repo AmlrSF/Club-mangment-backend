@@ -36,7 +36,9 @@ const createPost = async (req, res) => {
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate('author').populate('club');
+        const posts = await Post.find().populate('author').populate('club') .populate({
+            path: 'comments.author',
+        });
         res.status(200).json({ success: true, posts });
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -169,7 +171,65 @@ const getPostByGroupeId = async(req,res)=>{
     }
 }
 
+
+const addComment = async (req, res) => {
+    const { id } = req.params; // Get post ID from params
+    const { content, author, replyTo } = req.body; // Get comment data from body
+
+    try {
+        const post = await Post.findById(id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Create new comment
+        const newComment = {
+            content,
+            author,
+            replyTo: replyTo || null, // If it's a reply, include the replyTo field
+            commentDate: new Date()
+        };
+
+        // Add comment to the post's comments array
+        post.comments.push(newComment);
+        await post.save();
+
+        res.status(201).json({ message: 'Comment added', post });
+    } catch (error) {
+        res.status(500).json({ message: 'Error adding comment', error });
+    }
+};
+
+const toggleLike = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.body.id; // Assuming user ID is available in req.body
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        const userIndexInLikes = post.comments.likes.indexOf(userId);
+        if (userIndexInLikes !== -1) {
+            // If user has already liked, remove the like
+            post.comments.likes.splice(userIndexInLikes, 1);
+        } else {
+            // If user has not liked, add the like
+            post.comments.likes.push(userId);
+        }
+
+        await post.save();
+        res.status(200).json({ success: true, message: 'Like toggled successfully', post });
+    } catch (error) {
+        console.error('Error toggling like for post:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
 module.exports = {
+    toggleLike,
+    addComment,
     createPost,
     getAllPosts,
     getPostById,

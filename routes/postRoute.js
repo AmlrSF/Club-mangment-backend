@@ -9,7 +9,8 @@ const {
     toggleUpvote,
     toggleDownvote,
     getPostByGroupeId,
-    addComment
+    addComment,
+    toggleLike
 } = require('../controllers/postCrud');
 
 // Define routes for the base endpoint '/posts'
@@ -35,6 +36,10 @@ router.route('/:id/downvote')
 
 router.route('/:id/comment')
     .post(addComment); // Add a comment to a post
+
+router.route('/:id/likecomment')
+    .post(toggleLike); // Add a comment to a post
+
 
 
 module.exports = router;
