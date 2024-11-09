@@ -8,7 +8,8 @@ const {
     deletePostById,
     toggleUpvote,
     toggleDownvote,
-    getPostByGroupeId
+    getPostByGroupeId,
+    addComment
 } = require('../controllers/postCrud');
 
 // Define routes for the base endpoint '/posts'
@@ -31,5 +32,9 @@ router.route('/:id/upvote')
 // Route to toggle downvote for a post
 router.route('/:id/downvote')
     .patch(toggleDownvote);
+
+router.route('/:id/comment')
+    .post(addComment); // Add a comment to a post
+
 
 module.exports = router;
