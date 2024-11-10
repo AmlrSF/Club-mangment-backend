@@ -49,8 +49,11 @@ const getAllPosts = async (req, res) => {
 // Get a post by ID
 const getPostById = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('author').populate('club') .populate({
+        const post = await Post.findById(req.params.id)
+        .populate('author').populate('club').populate({
             path: 'comments.author',
+        }).populate({
+            path: 'comments.replyTo',
         });
         if (!post) {
             return res.status(404).json({ success: false, error: 'Post not found' });
@@ -242,6 +245,65 @@ const toggleLike = async (req, res) => {
     }
 };
 
+const deleteComment = async (req, res) => {
+    const { postId, commentId } = req.params;
+    
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        const commentIndex = post.comments.findIndex(comment => comment._id.toString() === commentId);
+        if (commentIndex === -1) {
+            return res.status(404).json({ success: false, error: 'Comment not found' });
+        }
+
+     
+        // Remove the comment
+        post.comments.splice(commentIndex, 1);
+        await post.save();
+
+        res.status(200).json({ success: true, message: 'Comment deleted successfully', post });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+
+const editComment = async (req, res) => {
+    const { postId, commentId } = req.params;
+    const { content, authorId } = req.body; // Get new content and author ID from request body
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        const comment = post.comments.find(comment => comment._id.toString() === commentId);
+        if (!comment) {
+            return res.status(404).json({ success: false, error: 'Comment not found' });
+        }
+
+        // Ensure the user editing is the comment's author
+        if (comment.author.toString() !== authorId) {
+            return res.status(403).json({ success: false, error: 'Unauthorized to edit this comment' });
+        }
+
+        // Update the comment content
+        comment.content = content;
+        await post.save();
+
+        res.status(200).json({ success: true, message: 'Comment edited successfully', post });
+    } catch (error) {
+        console.error('Error editing comment:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+
 
 module.exports = {
     toggleLike,
@@ -253,5 +315,7 @@ module.exports = {
     deletePostById,
     toggleUpvote,
     toggleDownvote,
-    getPostByGroupeId
+    getPostByGroupeId,
+    editComment,
+    deleteComment
 };
