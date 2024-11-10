@@ -37,7 +37,7 @@ router.route('/:id/downvote')
 router.route('/:id/comment')
     .post(addComment); // Add a comment to a post
 
-router.route('/:id/likecomment')
+router.route('/:postId/comments/:commentId/like')
     .post(toggleLike); // Add a comment to a post
 
 

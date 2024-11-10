@@ -49,7 +49,9 @@ const getAllPosts = async (req, res) => {
 // Get a post by ID
 const getPostById = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id).populate('author').populate('club') .populate({
+            path: 'comments.author',
+        });
         if (!post) {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
@@ -202,30 +204,44 @@ const addComment = async (req, res) => {
 
 const toggleLike = async (req, res) => {
     try {
-        const postId = req.params.id;
+        const postId = req.params.postId; // ID of the post containing the comment
+        const commentId = req.params.commentId; // ID of the comment
         const userId = req.body.id; // Assuming user ID is available in req.body
 
+        // Find the post by ID
         const post = await Post.findById(postId);
+
+        console.log(postId, commentId, userId);
+        
         if (!post) {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
 
-        const userIndexInLikes = post.comments.likes.indexOf(userId);
-        if (userIndexInLikes !== -1) {
-            // If user has already liked, remove the like
-            post.comments.likes.splice(userIndexInLikes, 1);
-        } else {
-            // If user has not liked, add the like
-            post.comments.likes.push(userId);
+        // Find the comment within the post's comments array by ID
+        const comment = post.comments.id(commentId);
+        if (!comment) {
+            return res.status(404).json({ success: false, error: 'Comment not found' });
         }
 
+        // Check if the user has already liked the comment
+        const userIndexInLikes = comment.likes.indexOf(userId);
+        if (userIndexInLikes !== -1) {
+            // If user has already liked, remove the like
+            comment.likes.splice(userIndexInLikes, 1);
+        } else {
+            // If user has not liked, add the like
+            comment.likes.push(userId);
+        }
+
+        // Save the updated post with modified comment likes
         await post.save();
-        res.status(200).json({ success: true, message: 'Like toggled successfully', post });
+        res.status(200).json({ success: true, message: 'Comment like toggled successfully', post });
     } catch (error) {
-        console.error('Error toggling like for post:', error);
+        console.error('Error toggling like for comment:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
+
 
 module.exports = {
     toggleLike,
