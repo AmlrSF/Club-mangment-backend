@@ -183,6 +183,8 @@ const addComment = async (req, res) => {
 
     try {
         const post = await Post.findById(id);
+        //console.log(post);
+
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
@@ -194,6 +196,9 @@ const addComment = async (req, res) => {
             replyTo: replyTo || null, // If it's a reply, include the replyTo field
             commentDate: new Date()
         };
+
+        console.log(newComment);
+        
 
         // Add comment to the post's comments array
         post.comments.push(newComment);
@@ -213,6 +218,7 @@ const toggleLike = async (req, res) => {
 
         // Find the post by ID
         const post = await Post.findById(postId);
+        console.log(post);
 
         console.log(postId, commentId, userId);
         

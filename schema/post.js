@@ -5,7 +5,7 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  genre: { type: String, required: true },    
+     
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer', 
@@ -31,6 +31,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  genre: { type: String, required: false }, 
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer', 
@@ -61,7 +62,7 @@ const postSchema = new mongoose.Schema({
     enum: ['profile', 'club'],
     required: true
   },
-  comments: [commentSchema] // Embedding comments as a subdocument
+  comments: [commentSchema] //Embedding comments as a subdocument
 });
 
 const Post = mongoose.model('Post', postSchema);
