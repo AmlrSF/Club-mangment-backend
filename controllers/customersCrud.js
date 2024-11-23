@@ -265,7 +265,8 @@ const getCustomerById = async (req, res) => {
 
     try {
         
-        const customer = await Customer.findById(customerId);
+        const customer = await Customer.findById(customerId)
+        .populate('interests'); 
 
         if (!customer) {
             return res.status(404).json({ success: false, error: 'Customer not found' });

@@ -84,7 +84,16 @@ const getClubById = async (req, res) => {
 const updateClub = async (req, res) => {
   const clubId = req.params.id;
   try {
-    const updatedClub = await Club.findByIdAndUpdate(clubId, req.body, {
+    let profilePictureUrl = null;
+
+    if (req.body.profilePicture) {
+      const photoUrl = await cloudinary.uploader.upload(
+        req.body.profilePicture
+      );
+      profilePictureUrl = photoUrl.url;
+    }
+
+    const updatedClub = await Club.findByIdAndUpdate(clubId, {...req.body, profilePicture : profilePictureUrl}, {
       new: true,
     });
     if (!updatedClub) {
