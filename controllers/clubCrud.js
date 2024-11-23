@@ -137,6 +137,19 @@ const joinSquad = async (req, res) => {
         .json({ success: false, error: "User is already a member" });
     }
 
+    if (squad.moderators.includes(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User is already a Moderator" });
+    }
+
+
+    if (userId == squad.ownerId) {
+      return res
+        .status(400)
+        .json({ success: false, error: "user is already Admin" });
+    }
+
     // Add the user to the members array
     squad.members.push(userId);
     await squad.save();
