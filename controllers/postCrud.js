@@ -36,7 +36,9 @@ const createPost = async (req, res) => {
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate('author').populate('club') .populate({
+        const posts = await Post.find()
+        .populate('author')
+        .populate('club') .populate({
             path: 'comments.author',
         });
         res.status(200).json({ success: true, posts });
