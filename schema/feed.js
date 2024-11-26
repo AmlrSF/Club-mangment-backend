@@ -7,8 +7,7 @@ const Interest = require('../schema/interest');
 const feedSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    unique: true
+  
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
   interests: [{
