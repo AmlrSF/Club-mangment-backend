@@ -9,7 +9,7 @@ const authenticate = (req, res, next) => {
     // console.log(token);
 
     if (!token) {
-        return res.status(201).json({success:false, error: 'Unauthorized - No token provided' });
+        return res.status(201).json({success:false, error: 'Unauthorized user- No token provided' });
     }
 
     try {
