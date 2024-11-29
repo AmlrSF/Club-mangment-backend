@@ -8,6 +8,7 @@ const interest = require('./routes/interestRoute');
 const club = require('./routes/clubRoute');
 const post = require('./routes/postRoute');
 const feed = require('./routes/feedRoute');
+const SavePosts = require('./routes/SavedPostsRoute');
 
 
 const cookieParser = require('cookie-parser');
@@ -30,6 +31,8 @@ app.use('/api/v1/clubs',club);
 app.use('/api/v1/posts',post);
 
 app.use('/api/v1/feeds',feed);
+
+app.use('/api/v1/savePosts',SavePosts);
 
 
 
