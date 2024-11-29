@@ -10,7 +10,6 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-// Create a new club
 const createClub = async (req, res) => {
   try {
     let profilePictureUrl = null;
@@ -22,7 +21,6 @@ const createClub = async (req, res) => {
       profilePictureUrl = photoUrl.url;
     }
 
-    // Create the new club with the profile picture URL
     const newClub = await Club.create({
       ...req.body,
       profilePicture: profilePictureUrl,
